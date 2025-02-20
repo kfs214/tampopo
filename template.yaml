@@ -41,16 +41,21 @@ Resources:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: 'true'
-  HelloWorld:
+  GetWeatherForecast:
     Type: AWS::Serverless::Function
     Properties:
-      Description: Hello World
+      Description: Get weather forecast and send a message via LINE
       Runtime: nodejs22.x
       Architectures:
       - x86_64
-      Handler: src/handlers/hello-world.helloWorldHandler
+      Handler: src/handlers/get-weather-forecast.getWeatherForecastHandler
       MemorySize: 128
       Timeout: 100
+      Events:
+        ScheduledEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(15 15 * * ? *)
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
