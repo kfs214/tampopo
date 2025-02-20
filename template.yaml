@@ -41,6 +41,16 @@ Resources:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: 'true'
+  HelloWorld:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Hello World
+      Runtime: nodejs22.x
+      Architectures:
+      - x86_64
+      Handler: src/handlers/hello-world.helloWorldHandler
+      MemorySize: 128
+      Timeout: 100
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
