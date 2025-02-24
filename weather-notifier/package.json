@@ -6,11 +6,11 @@
   "author": "Kazuki USHIJIMA",
   "license": "MIT",
   "scripts": {
-    "unit": "jest",
-    "lint": "eslint '*.ts' --quiet --fix",
     "compile": "tsc",
+    "unit": "jest",
     "test": "npm run compile && npm run unit",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "lint": "eslint '*.ts' --quiet --fix"
   },
   "dependencies": {
     "esbuild": "0.14.14"

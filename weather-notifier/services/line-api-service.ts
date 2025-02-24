@@ -2,7 +2,6 @@ const lineApiService = {
   async push({ to, messages }: { to: string; messages: { type: 'text'; text: string }[] }) {
     const accessToken = process.env.LINE_ACCESS_TOKEN;
 
-
     if (!accessToken) {
       throw new Error('LINE_ACCESS_TOKEN environment variable is not set');
     }
