@@ -1,6 +1,6 @@
-import lineApi from '../../services/line-api';
+import lineApiService from '../../services/line-api-service';
 
-describe('lineApi', () => {
+describe('lineApiService', () => {
   beforeEach(() => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
@@ -17,7 +17,7 @@ describe('lineApi', () => {
   it('should send a message successfully', async () => {
     const to = 'testUser';
     const message = 'Hello, World!';
-    const response = await lineApi.push(to, message);
+    const response = await lineApiService.push({ to, messages: [{ type: 'text', text: message }] });
 
     expect(global.fetch).toHaveBeenCalledWith(
       'https://api.line.me/v2/bot/message/push',
@@ -52,6 +52,8 @@ describe('lineApi', () => {
     const to = 'testUser';
     const message = 'Hello, World!';
 
-    await expect(lineApi.push(to, message)).rejects.toThrow('Error: Internal Server Error');
+    await expect(lineApiService.push({ to, messages: [{ type: 'text', text: message }] })).rejects.toThrow(
+      'Error: Internal Server Error',
+    );
   });
 });

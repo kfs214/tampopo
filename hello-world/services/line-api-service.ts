@@ -1,18 +1,20 @@
-const lineApi = {
-  async push(to: string, message: string) {
+const lineApiService = {
+  async push({ to, messages }: { to: string; messages: { type: 'text'; text: string }[] }) {
+    const accessToken = process.env.LINE_ACCESS_TOKEN;
+
+
+    if (!accessToken) {
+      throw new Error('LINE_ACCESS_TOKEN environment variable is not set');
+    }
+
     const url = 'https://api.line.me/v2/bot/message/push';
     const headers = {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.LINE_ACCESS_TOKEN}`,
+      Authorization: `Bearer ${accessToken}`,
     };
     const data = {
       to,
-      messages: [
-        {
-          type: 'text',
-          text: message,
-        },
-      ],
+      messages,
     };
 
     try {
@@ -32,4 +34,4 @@ const lineApi = {
   },
 };
 
-export default lineApi;
+export default lineApiService;

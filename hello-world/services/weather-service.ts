@@ -2,11 +2,19 @@ import { WeatherForecast } from '../types/openweathermap';
 
 const weatherService = {
   async getWeatherForecast(): Promise<string> {
+    const lat = process.env.WEATHER_LAT;
+    const lon = process.env.WEATHER_LON;
+    const apiKey = process.env.WEATHER_API_KEY;
+
+    if (!lat || !lon || !apiKey) {
+      throw new Error('One or more environment variables (WEATHER_LAT, WEATHER_LON, WEATHER_API_KEY) are not set');
+    }
+
     const url = `https://api.openweathermap.org/data/2.5/forecast`;
     const queryParams = new URLSearchParams({
-      lat: process.env.WEATHER_LAT || '',
-      lon: process.env.WEATHER_LON || '',
-      appid: process.env.WEATHER_API_KEY || '',
+      lat,
+      lon,
+      appid: apiKey,
       units: 'metric',
       cnt: '6',
     });
