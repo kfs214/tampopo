@@ -1,38 +1,56 @@
 # tampopo
 
-This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
+This AWS Lambda function fetches weather forecasts from the OpenWeatherMap API, calculates the total snowfall, formats a message, and sends it to a specified LINE user using the LINE Messaging API.
 
-- weather-notifier - Code for the application's Lambda function written in TypeScript.
-- events - Invocation events that you can use to invoke the function.
-- weather-notifier/tests - Unit tests for the application code.
-- template.yaml - A template that defines the application's AWS resources.
+This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders:
 
-The application uses several AWS resources, including Lambda functions and an API Gateway API. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
+- `weather-notifier` - Code for the application's Lambda function written in TypeScript.
+- `weather-notifier/tests` - Unit tests for the application code.
+- `template.yaml` - A template that defines the application's AWS resources.
 
-If you prefer to use an integrated development environment (IDE) to build and test your application, you can use the AWS Toolkit.  
-The AWS Toolkit is an open source plug-in for popular IDEs that uses the SAM CLI to build and deploy serverless applications on AWS. The AWS Toolkit also adds a simplified step-through debugging experience for Lambda function code. See the following links to get started.
+The application uses several AWS resources, including Lambda functions and a CloudWatch Events rule. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
 
-- [CLion](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-- [GoLand](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-- [IntelliJ](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-- [WebStorm](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-- [Rider](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-- [PhpStorm](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-- [PyCharm](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-- [RubyMine](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-- [DataGrip](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-- [VS Code](https://docs.aws.amazon.com/toolkit-for-vscode/latest/userguide/welcome.html)
-- [Visual Studio](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/welcome.html)
+## Prerequisites
 
-## Deploy the sample application
-
-The Serverless Application Model Command Line Interface (SAM CLI) is an extension of the AWS CLI that adds functionality for building and testing Lambda applications. It uses Docker to run your functions in an Amazon Linux environment that matches Lambda. It can also emulate your application's build environment and API.
-
-To use the SAM CLI, you need the following tools.
+To use the SAM CLI, you need the following tools:
 
 - SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 - Node.js - [Install Node.js 22](https://nodejs.org/en/), including the NPM package management tool.
 - Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
+
+## Environment Variables
+
+The following environment variables must be specified for the application to function correctly:
+
+- `WEATHER_LAT`: Latitude for the weather forecast location.
+- `WEATHER_LON`: Longitude for the weather forecast location.
+- `WEATHER_API_KEY`: Your OpenWeatherMap API key.
+- `LINE_ACCESS_TOKEN`: Your LINE Messaging API access token.
+- `LINE_TO`: The ID to send the message to.
+
+You can specify these variables in two ways:
+
+1. **AWS Management Console**: Navigate to the Lambda function configuration and set the environment variables under the "Configuration" tab.
+
+2. **template.yaml**: Update the `template.yaml` file to include your environment variable values:
+
+```yaml
+Resources:
+  WeatherNotifierFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      # ...existing code...
+      Environment:
+        Variables:
+          WEATHER_LAT: your_weather_lat
+          WEATHER_LON: your_weather_lon
+          WEATHER_API_KEY: your_api_key
+          LINE_ACCESS_TOKEN: your_line_access_token
+          LINE_TO: your_line_to
+      # ...existing code...
+```
+
+## Deploy the application
 
 To build and deploy your application for the first time, run the following in your shell:
 
@@ -49,7 +67,7 @@ The first command will build the source of your application. The second command 
 - **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
 - **Save arguments to samconfig.toml**: If set to yes, your choices will be saved to a configuration file inside the project, so that in the future you can just re-run `sam deploy` without parameters to deploy changes to your application.
 
-You can find your API Gateway Endpoint URL in the output values displayed after deployment.
+You can find your Lambda function ARN in the output values displayed after deployment.
 
 ## Use the SAM CLI to build and test locally
 
@@ -66,25 +84,7 @@ Test a single function by invoking it directly with a test event. An event is a 
 Run functions locally and invoke them with the `sam local invoke` command.
 
 ```bash
-tampopo$ sam local invoke WeatherNotifierFunction --event events/event.json
-```
-
-The SAM CLI can also emulate your application's API. Use the `sam local start-api` to run the API locally on port 3000.
-
-```bash
-tampopo$ sam local start-api
-tampopo$ curl http://localhost:3000/
-```
-
-The SAM CLI reads the application template to determine the API's routes and the functions that they invoke. The `Events` property on each function's definition includes the route and method for each path.
-
-```yaml
-Events:
-  WeatherNotifier:
-    Type: Api
-    Properties:
-      Path: /weather-notifier
-      Method: get
+tampopo$ sam local invoke WeatherNotifierFunction
 ```
 
 ## Add a resource to your application
@@ -125,4 +125,4 @@ sam delete --stack-name tampopo
 
 See the [AWS SAM developer guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html) for an introduction to SAM specification, the SAM CLI, and serverless application concepts.
 
-Next, you can use AWS Serverless Application Repository to deploy ready to use Apps that go beyond hello world samples and learn how authors developed their applications: [AWS Serverless Application Repository main page](https://aws.amazon.com/serverless/serverlessrepo/)
+Next, you can use AWS Serverless Application Repository to deploy ready-to-use Apps that go beyond hello world samples and learn how authors developed their applications: [AWS Serverless Application Repository main page](https://aws.amazon.com/serverless/serverlessrepo/)
