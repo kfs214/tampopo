@@ -14,8 +14,6 @@ Globals:
     Environment:
       Variables:
         TZ: "Asia/Tokyo"
-  Api:
-    TracingEnabled: true
 
 Resources:
   WeatherNotifierFunction:
@@ -34,11 +32,10 @@ Resources:
           WEATHER_API_KEY: your_api_key
           LINE_TO: your_line_to
       Events:
-        WeatherNotifier:
-          Type: Api
+        WeatherNotifierCron:
+          Type: Schedule
           Properties:
-            Path: /weather-notifier
-            Method: get
+            Schedule: cron(15 15 * * ? *)
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -63,9 +60,6 @@ Resources:
       AutoConfigurationEnabled: 'true'
 
 Outputs:
-  WeatherNotifierApi:
-    Description: API Gateway endpoint URL for Prod stage for Weather Notifier function
-    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/weather-notifier/'
   WeatherNotifierFunction:
     Description: Weather Notifier Lambda Function ARN
     Value: !GetAtt WeatherNotifierFunction.Arn
