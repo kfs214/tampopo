@@ -13,7 +13,7 @@ Globals:
       LogFormat: JSON
     Environment:
       Variables:
-        TZ: "Asia/Tokyo"
+        TZ: 'Asia/Tokyo'
 
 Resources:
   WeatherNotifierFunction:
@@ -35,7 +35,7 @@ Resources:
         WeatherNotifierCron:
           Type: Schedule
           Properties:
-            Schedule: cron(15 15 * * ? *)
+            Schedule: cron(15 6 * * ? *)
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
