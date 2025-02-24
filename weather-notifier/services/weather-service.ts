@@ -34,12 +34,15 @@ const weatherService = {
       // Round snowSum
       const roundedSnowSum = Math.round(snowSum);
 
-      // Generate date text
+      // Generate date text using Intl.DateTimeFormat
+      const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+      });
       const startDate = new Date(data.list[0].dt * 1000);
       const endDate = new Date(data.list[data.list.length - 1].dt * 1000);
-      const dateText = `${startDate.getMonth() + 1}/${startDate.getDate()} ${startDate.getHours()}時〜${
-        endDate.getMonth() + 1
-      }/${endDate.getDate()} ${endDate.getHours()}時`;
+      const dateText = `${dateFormatter.format(startDate)}〜${dateFormatter.format(endDate)}`;
 
       // Return formatted text
       return `${dateText}の予想降雪量：${roundedSnowSum}cm`;
