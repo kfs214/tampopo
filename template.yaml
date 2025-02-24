@@ -3,35 +3,40 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   tampopo
 
-  Sample SAM Template for tampopo
+  This AWS Lambda function fetches weather forecasts from the OpenWeatherMap API, calculates the total snowfall, formats a message, and sends it to a specified LINE user using the LINE Messaging API.
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
-
     Tracing: Active
-    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
     LoggingConfig:
       LogFormat: JSON
   Api:
     TracingEnabled: true
+
 Resources:
   WeatherNotifierFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: weather-notifier/
       Handler: app.lambdaHandler
       Runtime: nodejs22.x
       Architectures:
         - x86_64
+      Environment:
+        Variables:
+          LINE_ACCESS_TOKEN: your_line_access_token
+          WEATHER_LAT: your_weather_lat
+          WEATHER_LON: your_weather_lon
+          WEATHER_API_KEY: your_api_key
+          LINE_TO: your_line_to
       Events:
         WeatherNotifier:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /weather-notifier
             Method: get
-    Metadata: # Manage esbuild properties
+    Metadata:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
@@ -53,16 +58,14 @@ Resources:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: 'true'
+
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   WeatherNotifierApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Description: API Gateway endpoint URL for Prod stage for Weather Notifier function
     Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/weather-notifier/'
   WeatherNotifierFunction:
-    Description: Hello World Lambda Function ARN
+    Description: Weather Notifier Lambda Function ARN
     Value: !GetAtt WeatherNotifierFunction.Arn
   WeatherNotifierFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
+    Description: Implicit IAM Role created for Weather Notifier function
     Value: !GetAtt WeatherNotifierFunctionRole.Arn
