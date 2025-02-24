@@ -11,6 +11,9 @@ Globals:
     Tracing: Active
     LoggingConfig:
       LogFormat: JSON
+    Environment:
+      Variables:
+        TZ: "Asia/Tokyo"
   Api:
     TracingEnabled: true
 
