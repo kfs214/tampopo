@@ -20,11 +20,13 @@ const weatherService = {
     });
 
     try {
+      console.info('Fetching weather data from OpenWeatherMap API');
       const response = await fetch(`${url}?${queryParams.toString()}`);
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
       const data: WeatherForecast = await response.json();
+      console.info('Weather data fetched successfully');
 
       // Sum snowfall
       const snowSum = data.list.reduce((sum, item) => {

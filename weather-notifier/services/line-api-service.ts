@@ -17,6 +17,7 @@ const lineApiService = {
     };
 
     try {
+      console.info('Sending message to LINE API');
       const response = await fetch(url, {
         method: 'POST',
         headers: headers,
@@ -25,6 +26,7 @@ const lineApiService = {
       if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
+      console.info('Message sent to LINE API successfully');
       return await response.json();
     } catch (error) {
       console.error('Error sending message:', error);
