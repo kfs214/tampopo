@@ -1,0 +1,9 @@
+{
+  "WeatherNotifierFunction": {
+    "WEATHER_LAT": "your_weather_lat",
+    "WEATHER_LON": "your_weather_lon",
+    "WEATHER_API_KEY": "your_api_key",
+    "LINE_ACCESS_TOKEN": "your_line_access_token",
+    "LINE_TO": "your_line_to"
+  }
+}
