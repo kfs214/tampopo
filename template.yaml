@@ -1,33 +1,50 @@
-AWSTemplateFormatVersion: 2010-09-09
-Description: >-
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
   tampopo
-Transform:
-- AWS::Serverless-2016-10-31
 
-# Resources declares the AWS resources that you want to include in the stack
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
+  This AWS Lambda function fetches weather forecasts from the OpenWeatherMap API, calculates the total snowfall, formats a message, and sends it to a specified LINE user using the LINE Messaging API.
+
+Globals:
+  Function:
+    Timeout: 3
+    Tracing: Active
+    LoggingConfig:
+      LogFormat: JSON
+    Environment:
+      Variables:
+        TZ: 'Asia/Tokyo'
+
 Resources:
-  # This is the Lambda function definition associated with the source code: sqs-payload-logger.js. For all available properties, see
-  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-  ScheduledEventLogger:
+  WeatherNotifierFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Description: A Lambda function that logs the payload of messages sent to an
-        associated SQS queue.
+      CodeUri: weather-notifier/
+      Handler: app.lambdaHandler
       Runtime: nodejs22.x
       Architectures:
-      - x86_64
-      Handler: src/handlers/scheduled-event-logger.scheduledEventLoggerHandler
-      # This property associates this Lambda function with a scheduled CloudWatch Event. For all available properties, see
-      # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#schedule
-      # This example runs every hour.
+        - x86_64
+      Environment:
+        Variables:
+          WEATHER_LAT: your_weather_lat
+          WEATHER_LON: your_weather_lon
+          WEATHER_API_KEY: your_api_key
+          LINE_ACCESS_TOKEN: your_line_access_token
+          LINE_TO: your_line_to
       Events:
-        CloudWatchEvent:
+        WeatherNotifierCron:
           Type: Schedule
           Properties:
-            Schedule: cron(0 * * * ? *)
-      MemorySize: 128
-      Timeout: 100
+            Schedule: cron(15 6 * * ? *)
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:
@@ -41,8 +58,11 @@ Resources:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: 'true'
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
-Globals:
-  Function:
-    LoggingConfig:
-      LogFormat: JSON
+
+Outputs:
+  WeatherNotifierFunction:
+    Description: Weather Notifier Lambda Function ARN
+    Value: !GetAtt WeatherNotifierFunction.Arn
+  WeatherNotifierFunctionIamRole:
+    Description: Implicit IAM Role created for Weather Notifier function
+    Value: !GetAtt WeatherNotifierFunctionRole.Arn
